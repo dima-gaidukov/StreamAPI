@@ -184,7 +184,9 @@ public class Main {
         //Задание 1
         //Получите список продуктов из категории "Books" с ценой более 100.
         System.out.println("Задание 1");
-        Set<Product> priceBook = products.stream()
+        Set<Product> priceBook = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
+                .flatMap(order -> order.getProducts().stream())
                 .filter(product -> "Books".equals(product.getCategory()))
                 .filter(product -> product.getPrice().compareTo(new BigDecimal(100)) > 0)
                 .sorted(Comparator.comparing(Product::getPrice))
@@ -196,7 +198,9 @@ public class Main {
         //Задание 2
         //Получите список заказов с продуктами из категории "Children's products".
         System.out.println("Задание 2");
-        Set<Product> listProduct = products.stream()
+        Set<Product> listProduct = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
+                .flatMap(order -> order.getProducts().stream())
                 .filter(product -> "Children's products".equals(product.getCategory()))
                 .sorted(Comparator.comparing(Product::getPrice))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -207,7 +211,9 @@ public class Main {
         //Задание 3
         //Получите список продуктов из категории "Toys" и примените скидку 10% и получите сумму всех продуктов.
         System.out.println("Задание 3");
-        Set<Product> listToys = products.stream()
+        Set<Product> listToys = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
+                .flatMap(order -> order.getProducts().stream())
                 .filter(product -> "Toys".equals(product.getCategory()))
                 .sorted(Comparator.comparing(Product::getPrice))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -215,7 +221,9 @@ public class Main {
 
         System.out.println("\n");
 
-        Set<Product> listToysDiscont = products.stream()
+        Set<Product> listToysDiscont = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
+                .flatMap(order -> order.getProducts().stream())
                 .filter(product -> "Toys".equals(product.getCategory()))
                 .map(product -> new Product(
                         product.getId(),
@@ -254,7 +262,9 @@ public class Main {
         //Получите топ 2 самые дешевые продукты из категории "Books".
 
         System.out.println("Задание 5");
-        Set<Product> topTwoBook = products.stream()
+        Set<Product> topTwoBook = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
+                .flatMap(order -> order.getProducts().stream())
                 .filter(product -> "Books".equals(product.getCategory()))
                 .sorted(Comparator.comparing(Product::getPrice))
                 .limit(2)
@@ -266,7 +276,8 @@ public class Main {
         //Задание 6
         //Получите 3 самых последних сделанных заказа
         System.out.println("Задание 6");
-        Set<Order> lastOrder = orders.stream()
+        Set<Order> lastOrder = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
                 .sorted(Comparator.comparing(Order::getDeliveryDate).reversed())
                 .limit(3)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -278,7 +289,8 @@ public class Main {
         //Получите список заказов, сделанных 15-марта-2021, выведите id заказов в консоль и затем верните список их продуктов.
 
         System.out.println("Задание 7");
-        Set<Product> orderMart = orders.stream()
+        Set<Product> orderMart = customers.stream()
+                .flatMap(customer ->customer.getOrderSet().stream())
                 .filter(order -> order.getDate().equals(LocalDate.of(2021, 3, 15)))
                 .flatMap(order -> order.getProducts().stream())
                 .collect(Collectors.toSet());
@@ -290,7 +302,8 @@ public class Main {
         //Рассчитайте общую сумму всех заказов, сделанных в феврале 2021.
 
         System.out.println("Задание 8");
-        double summ = orders.stream()
+        double summ = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
                 .filter(order -> order.getDeliveryDate().getMonth() == Month.FEBRUARY && order.getDeliveryDate().getYear() == 2021)
                 .flatMap(order -> order.getProducts().stream())
                 .map(Product::getPrice)
@@ -305,7 +318,8 @@ public class Main {
         // Рассчитайте средний платеж по заказам, сделанным 14-марта-2021.
 
         System.out.println("Задание 9");
-        double mediumPayment = orders.stream()
+        double mediumPayment = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
                 .filter(order -> order.getDate().equals(LocalDate.of(2021, 3, 14)))
                 .mapToDouble(order -> order.getProducts().stream().mapToDouble(p -> p.getPrice().doubleValue()).sum())
                 .average()
@@ -319,7 +333,9 @@ public class Main {
 
         System.out.println("Задание 10");
 
-        DoubleSummaryStatistics stat = products.stream()
+        DoubleSummaryStatistics stat = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
+                .flatMap(order -> order.getProducts().stream())
                 .filter(product -> "Books".equals(product.getCategory()))
                 .mapToDouble(product -> product.getPrice().doubleValue())
                 .summaryStatistics();
@@ -336,7 +352,10 @@ public class Main {
         // Получите данные Map<Long, Integer> → key - id заказа, value - кол-во товаров в заказе
 
         System.out.println("Задание 11");
-        Map<Long, Integer> ordProd = orders1.stream()
+
+
+        Map<Long, Integer> ordProd = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
                 .collect(Collectors.toMap(Order::getId, order -> order.getProducts().size()));
         System.out.println(ordProd);
 
@@ -359,8 +378,9 @@ public class Main {
         //Задание 13
         //Создайте Map<Order, Double> → key - заказ, value - общая сумма продуктов заказа.
 
-        System.out.println("Задание 14");
-        Map<Order, Double> sumProd = orders.stream()
+        System.out.println("Задание 13");
+        Map<Order, Double> sumProd = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
                 .collect(Collectors.toMap(order -> order, order -> order.getProducts().stream()
                         .mapToDouble(product -> product.getPrice().doubleValue()).sum()));
         sumProd.forEach((order, sum) -> {
@@ -374,7 +394,9 @@ public class Main {
         //Получите Map<String, List<String>> → key - категория, value - список названий товаров в категории
         System.out.println("Задание 14");
 
-        Map<String, List<String>> categProd = products.stream()
+        Map<String, List<String>> categProd = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
+                .flatMap(order -> order.getProducts().stream())
                 .collect(Collectors.groupingBy(Product::getCategory, Collectors.mapping(Product::getName, Collectors.toList())));
         categProd.forEach((category, name) -> {
             System.out.println("категория: " + category);
@@ -386,7 +408,9 @@ public class Main {
         //Задание 15
         //Получите Map<String, Product> → самый дорогой продукт по каждой категории.
         System.out.println("Задание 15");
-        Map<String, Product> maxPriceCateg = products.stream()
+        Map<String, Product> maxPriceCateg = customers.stream()
+                .flatMap(customer -> customer.getOrderSet().stream())
+                .flatMap(order -> order.getProducts().stream())
                 .collect(Collectors.groupingBy(Product::getCategory,
                         Collectors.collectingAndThen(Collectors.maxBy(Comparator.comparing(Product::getPrice, BigDecimal::compareTo)), Optional::get)));
         maxPriceCateg.forEach((category, product) -> {
@@ -395,6 +419,5 @@ public class Main {
         });
 
 
-        
     }
 }
