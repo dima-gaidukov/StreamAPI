@@ -189,7 +189,6 @@ public class Main {
                 .flatMap(order -> order.getProducts().stream())
                 .filter(product -> "Books".equals(product.getCategory()))
                 .filter(product -> product.getPrice().compareTo(new BigDecimal(100)) > 0)
-                .sorted(Comparator.comparing(Product::getPrice))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         priceBook.forEach(System.out::println);
 
@@ -202,7 +201,6 @@ public class Main {
                 .flatMap(customer -> customer.getOrderSet().stream())
                 .flatMap(order -> order.getProducts().stream())
                 .filter(product -> "Children's products".equals(product.getCategory()))
-                .sorted(Comparator.comparing(Product::getPrice))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         listProduct.forEach(System.out::println);
 
@@ -210,16 +208,6 @@ public class Main {
 
         //Задание 3
         //Получите список продуктов из категории "Toys" и примените скидку 10% и получите сумму всех продуктов.
-        System.out.println("Задание 3");
-        Set<Product> listToys = customers.stream()
-                .flatMap(customer -> customer.getOrderSet().stream())
-                .flatMap(order -> order.getProducts().stream())
-                .filter(product -> "Toys".equals(product.getCategory()))
-                .sorted(Comparator.comparing(Product::getPrice))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-        listToys.forEach(System.out::println);
-
-        System.out.println("\n");
 
         Set<Product> listToysDiscont = customers.stream()
                 .flatMap(customer -> customer.getOrderSet().stream())
@@ -230,7 +218,6 @@ public class Main {
                         product.getName(),
                         product.getCategory(),
                         product.getPrice().multiply(new BigDecimal("0.9"))))
-                .sorted(Comparator.comparing(Product::getPrice))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         BigDecimal totalPrice = listToysDiscont.stream()
                 .map(Product::getPrice)
@@ -289,12 +276,17 @@ public class Main {
         //Получите список заказов, сделанных 15-марта-2021, выведите id заказов в консоль и затем верните список их продуктов.
 
         System.out.println("Задание 7");
-        Set<Product> orderMart = customers.stream()
+        Set<Order> orderMart = customers.stream()
                 .flatMap(customer ->customer.getOrderSet().stream())
                 .filter(order -> order.getDate().equals(LocalDate.of(2021, 3, 15)))
-                .flatMap(order -> order.getProducts().stream())
                 .collect(Collectors.toSet());
-        orderMart.forEach(System.out::println);
+        System.out.println("ID заказов 15-марта-2021");
+        orderMart.forEach(order -> System.out.println(order.getId()));
+
+        Set<Product> prodMart = orderMart.stream()
+                        .flatMap(order -> order.getProducts().stream())
+                                .collect(Collectors.toSet());
+        prodMart.forEach(System.out::println);
 
         System.out.println("\n");
 
