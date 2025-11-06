@@ -209,6 +209,7 @@ public class Main {
         //Задание 3
         //Получите список продуктов из категории "Toys" и примените скидку 10% и получите сумму всех продуктов.
 
+        System.out.println("Задание 3");
         Set<Product> listToysDiscont = customers.stream()
                 .flatMap(customer -> customer.getOrderSet().stream())
                 .flatMap(order -> order.getProducts().stream())
@@ -219,11 +220,14 @@ public class Main {
                         product.getCategory(),
                         product.getPrice().multiply(new BigDecimal("0.9"))))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
-        BigDecimal totalPrice = listToysDiscont.stream()
-                .map(Product::getPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (Product product : listToysDiscont) {
+            totalPrice = totalPrice.add(product.getPrice());
+        }
         listToysDiscont.forEach(System.out::println);
-        System.out.println("Общая сумма : " + totalPrice);
+        System.out.println("Общая сумма после скидки: " + totalPrice);
+
+
 
         System.out.println("\n");
 
@@ -276,17 +280,15 @@ public class Main {
         //Получите список заказов, сделанных 15-марта-2021, выведите id заказов в консоль и затем верните список их продуктов.
 
         System.out.println("Задание 7");
-        Set<Order> orderMart = customers.stream()
+        Set<Product> orderMart = customers.stream()
                 .flatMap(customer ->customer.getOrderSet().stream())
                 .filter(order -> order.getDate().equals(LocalDate.of(2021, 3, 15)))
+                .flatMap(order -> order.getProducts().stream())
                 .collect(Collectors.toSet());
-        System.out.println("ID заказов 15-марта-2021");
-        orderMart.forEach(order -> System.out.println(order.getId()));
 
-        Set<Product> prodMart = orderMart.stream()
-                        .flatMap(order -> order.getProducts().stream())
-                                .collect(Collectors.toSet());
-        prodMart.forEach(System.out::println);
+        System.out.println("ID заказов 15-марта-2021");
+        orderMart.forEach(System.out::println);
+
 
         System.out.println("\n");
 
