@@ -210,23 +210,25 @@ public class Main {
         //Получите список продуктов из категории "Toys" и примените скидку 10% и получите сумму всех продуктов.
 
         System.out.println("Задание 3");
-        Set<Product> listToysDiscont = customers.stream()
+        Set<Product> discountedToys = new LinkedHashSet<>();
+        BigDecimal totalPrice = customers.stream()
                 .flatMap(customer -> customer.getOrderSet().stream())
                 .flatMap(order -> order.getProducts().stream())
                 .filter(product -> "Toys".equals(product.getCategory()))
-                .map(product -> new Product(
-                        product.getId(),
-                        product.getName(),
-                        product.getCategory(),
-                        product.getPrice().multiply(new BigDecimal("0.9"))))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-        BigDecimal totalPrice = BigDecimal.ZERO;
-        for (Product product : listToysDiscont) {
-            totalPrice = totalPrice.add(product.getPrice());
-        }
-        listToysDiscont.forEach(System.out::println);
+                .map(product -> {
+                    BigDecimal discountedPrice = product.getPrice().multiply(new BigDecimal("0.9"));
+                    Product discountedProduct = new Product(
+                            product.getId(),
+                            product.getName(),
+                            product.getCategory(),
+                            discountedPrice
+                    );
+                    discountedToys.add(discountedProduct);
+                    return discountedPrice;
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        discountedToys.forEach(System.out::println);
         System.out.println("Общая сумма после скидки: " + totalPrice);
-
 
 
         System.out.println("\n");
@@ -280,14 +282,17 @@ public class Main {
         //Получите список заказов, сделанных 15-марта-2021, выведите id заказов в консоль и затем верните список их продуктов.
 
         System.out.println("Задание 7");
+        System.out.println("ID заказов 15-марта-2021:");
         Set<Product> orderMart = customers.stream()
-                .flatMap(customer ->customer.getOrderSet().stream())
+                .flatMap(customer -> customer.getOrderSet().stream())
                 .filter(order -> order.getDate().equals(LocalDate.of(2021, 3, 15)))
+                .peek(order -> System.out.println(order.getId()))
                 .flatMap(order -> order.getProducts().stream())
                 .collect(Collectors.toSet());
-
-        System.out.println("ID заказов 15-марта-2021");
+        System.out.println("Продукты из заказов:");
         orderMart.forEach(System.out::println);
+
+
 
 
         System.out.println("\n");
