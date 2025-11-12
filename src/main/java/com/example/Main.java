@@ -217,13 +217,6 @@ public class Main {
                 .filter(product -> "Toys".equals(product.getCategory()))
                 .map(product -> {
                     BigDecimal discountedPrice = product.getPrice().multiply(new BigDecimal("0.9"));
-                    Product discountedProduct = new Product(
-                            product.getId(),
-                            product.getName(),
-                            product.getCategory(),
-                            discountedPrice
-                    );
-                    discountedToys.add(discountedProduct);
                     return discountedPrice;
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -283,14 +276,16 @@ public class Main {
 
         System.out.println("Задание 7");
         System.out.println("ID заказов 15-марта-2021:");
-        Set<Product> orderMart = customers.stream()
+        List<Order> orderMart = customers.stream()
                 .flatMap(customer -> customer.getOrderSet().stream())
                 .filter(order -> order.getDate().equals(LocalDate.of(2021, 3, 15)))
-                .peek(order -> System.out.println(order.getId()))
-                .flatMap(order -> order.getProducts().stream())
-                .collect(Collectors.toSet());
-        System.out.println("Продукты из заказов:");
-        orderMart.forEach(System.out::println);
+                .peek(order -> {
+                    System.out.println("ID заказа: " + order.getId());
+                    System.out.println("Продукты из заказа " + order.getId() + ":");
+                    order.getProducts().forEach(product -> System.out.println("  - " + product));
+                })
+                .collect(Collectors.toList());
+
 
 
 
